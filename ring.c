@@ -51,13 +51,13 @@ int ring_getchar(RB* r,unsigned char* c)
 int ring_puts(RB* r,unsigned char*buf,int buf_len)
 {
 	int volume;
-	volume = ring_get_volume(r);
+	volume = ring_get_remain(r);
 	if(volume <buf_len)return RING_PUTS_FAILED;
 	while(buf_len)
 	{
 		if(ring_putchar(r,*buf)<0)
 		{
-			ring_perror("ring_putchar",RING_PUTS_FAILED);
+			ring_perror("ring_putchar() ",RING_PUT_FAILED);
 			return RING_PUTS_FAILED;
 		}
 		buf++;
@@ -74,10 +74,10 @@ int ring_gets(RB* r,unsigned char* buf,int len_tryto_read,int* len_actual_read)
 	{
 		if(ring_getchar(r,buf)<0)
 		{
-			ring_perror("ring_putchar",RING_GETS_FAILED);
+			ring_perror("ring_getchar() ",RING_GET_FAILED);
 			return RING_GETS_FAILED;
 		}
-		len_actual_read++;
+		(*len_actual_read)++;
 		buf++;
 	}
 	
@@ -102,7 +102,7 @@ int ring_get_count(RB*r)
     return r->count;
 }
 
-int ring_get_volume(RB* r)
+int ring_get_remain(RB* r)
 {
     return ((r->size)-(r->count));
 }
@@ -116,7 +116,7 @@ int ring_is_full(RB* r)
     return (r->count >= r->size) ? 1:0;
 }
 
-void ring_perror(char* fmt,int error)
+int ring_perror(char* fmt,int error)
 {
 	char* str = (char*)malloc(128);
 	memset(str,0,128);
@@ -125,13 +125,13 @@ void ring_perror(char* fmt,int error)
 	switch(error)
 	{
 		case RING_GETS_FAILED:
-				strcat(str,"RING_GETS_FAILED");
+				strcat(str," [warning]  no so much data");
 				break;
 		case RING_PUTS_FAILED:
 				strcat(str,"RING_PUTS_FAILED");
 				break;
 		case RING_GET_FAILED:
-				strcat(str,"RING_GETCHAR_FAILED");
+				strcat(str," [warning]  ring empty");
 				break;
 		case RING_PUT_FAILED:
 				strcat(str,"RING_GETCHAR_FAILED");
@@ -150,7 +150,7 @@ void ring_perror(char* fmt,int error)
 				break;
 	}
 	fprintf(stdout,"%s \n",str);
-	return;
+	return 0;
 	
 }
 
