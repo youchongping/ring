@@ -128,7 +128,7 @@ int ring_perror(char* fmt,int error)
 				strcat(str," [warning]  no so much data");
 				break;
 		case RING_PUTS_FAILED:
-				strcat(str,"[error] no enough space to puts() in,should gets() out some data or ring_reset()");
+				strcat(str,"[error] no enough space to puts(),should gets() out some data or ring_reset()");
 				break;
 		case RING_GET_FAILED:
 				strcat(str," [warning]  ring empty");
